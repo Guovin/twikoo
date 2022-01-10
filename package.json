@@ -1,16 +1,16 @@
 {
-  "name": "twikoo",
-  "version": "1.4.15",
+  "name": "govin-twikoo",
+  "version": "1.4.16",
   "description": "A simple comment system based on Tencent CloudBase (tcb).",
-  "author": "imaegoo <hello@imaegoo.com> (https://github.com/imaegoo)",
+  "author": "govin <govin.top> (https://github.com/guovin)",
   "license": "MIT",
-  "main": "./dist/twikoo.all.min.js",
+  "main": "./dist/twikoo.min.js",
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/imaegoo/twikoo.git"
+    "url": "https://github.com/guovin/twikoo.git"
   },
   "homepage": "https://twikoo.js.org",
   "scripts": {
