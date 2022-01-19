@@ -1200,7 +1200,7 @@ async function parse (comment) {
     created: timestamp,
     updated: timestamp
   }
-  if (isQQ(comment.mail)) {
+  if (!isAdminUser && isQQ(comment.mail)) {
     commentDo.mail = addQQMailSuffix(comment.mail)
     commentDo.mailMd5 = md5(commentDo.mail)
     commentDo.avatar = await getQQAvatar(comment.mail)

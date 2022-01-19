@@ -43,10 +43,10 @@ export default {
         return this.avatar
       } else if (this.mailMd5) {
         return `https://${this.gravatarCdn}/avatar/${this.mailMd5}?d=${this.defaultGravatar}`
-      } else if (this.mail && isQQ(this.mail)) {
-        return getQQAvatar(this.mail)
       } else if (this.mail) {
         return `https://${this.gravatarCdn}/avatar/${md5(this.mail)}?d=${this.defaultGravatar}`
+      } else if (this.mail && isQQ(this.mail)) {
+        return getQQAvatar(this.mail)
       } else {
         return ''
       }
