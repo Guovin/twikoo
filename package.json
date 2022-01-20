@@ -1,6 +1,6 @@
 {
-  "name": "govin-twikoo",
-  "version": "1.5.0",
+  "name": "twikoo-govin",
+  "version": "1.0.0",
   "description": "A simple comment system based on Tencent CloudBase (tcb).",
   "author": "govin <govin.top> (https://github.com/guovin)",
   "license": "MIT",
