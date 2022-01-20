@@ -27,7 +27,7 @@ const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window)
 
 // 常量 / constants
-const VERSION = '1.4.15'
+const VERSION = '1.5.0'
 const RES_CODE = {
   SUCCESS: 0,
   NO_PARAM: 100,
