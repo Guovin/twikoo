@@ -1,1 +1,1 @@
-module.exports = require('twikoo-vercel')
+module.exports = require('govin-twikoo-vercel')

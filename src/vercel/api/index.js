@@ -1,5 +1,5 @@
 /*!
- * Twikoo vercel function v1.4.15
+ * Twikoo vercel function v1.5.0
  * (c) 2020-present iMaeGoo
  * Released under the MIT License.
  */
