@@ -1,6 +1,6 @@
 {
   "name": "govin-twikoo-vercel",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A simple comment system based on Tencent CloudBase (tcb).",
   "author": "govin <govin.top> (https://github.com/guovin)",
   "license": "MIT",
