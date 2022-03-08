@@ -1,6 +1,6 @@
 # 快速上手
 
-Twikoo 分为云函数和前端两部分，部署时请注意保存二者版本一致。
+Twikoo 分为云函数和前端两部分，部署时请注意保持二者版本一致。
 
 * [云函数部署](#云函数部署)有 4 种方式，[一键部署](#一键部署)、[手动部署](#手动部署)、[命令行部署](#命令行部署)和[Vercel 部署](#vercel-部署)。
 * [前端部署](#前端部署)有 2 种方式，如果您的网站主题支持 Twikoo，您只需在配置文件中指定 Twikoo 即可；如果您的网站主题不支持 Twikoo，您需要修改源码手动引入 Twikoo 的 js 文件并初始化之。
@@ -29,7 +29,7 @@ Twikoo 分为云函数和前端两部分，部署时请注意保存二者版本�
 ::: tip 提示
 * 推荐创建上海环境。如选择广州环境，需要在 `twikoo.init()` 时额外指定环境 `region: "ap-guangzhou"`
 * 环境名称自由填写
-* 推荐选择计费方式`包年包月`，套餐版本`基础班 1`，超出免费额度不会收费
+* 推荐选择计费方式`包年包月`，套餐版本`基础版 1`，超出免费额度不会收费
 * 如果提示选择“应用模板”，请选择“空模板”
 :::
 2. 进入[云开发控制台](https://console.cloud.tencent.com/tcb/)<br>
@@ -44,7 +44,7 @@ exports.main = require('twikoo-func').main
 8. 创建完成后，点击“twikoo"进入云函数详情页，进入“函数代码”标签，点击“文件 - 新建文件”，输入 `package.json`，回车
 9. 复制以下代码、粘贴到代码框中，点击“保存并安装依赖”
 ``` json
-{ "dependencies": { "twikoo-func": "1.4.17" } }
+{ "dependencies": { "twikoo-func": "1.5.0" } }
 ```
 
 ### 命令行部署
@@ -129,7 +129,7 @@ Vercel 部署的环境需配合 1.4.0 以上版本的 twikoo.js 使用
 # For NexT version >= 8.0.0 && < 8.4.0
 npm install hexo-next-twikoo@1.0.0
 # For NexT version >= 8.4.0
-npm install hexo-next-twikoo@1.0.1
+npm install hexo-next-twikoo@1.0.3
 ```
 
 然后在配置中添加
@@ -138,8 +138,8 @@ npm install hexo-next-twikoo@1.0.1
 twikoo:
   enable: true
   visitor: true
-  envId: xxxxxxxxxxxxxxx # 腾讯云环境id
-  # region: ap-guangzhou # 环境地域，默认为 ap-shanghai
+  envId: xxxxxxxxxxxxxxx # 腾讯云环境填 envId；Vercel 环境填地址（https://xxx.vercel.app）
+  # region: ap-guangzhou # 环境地域，默认为 ap-shanghai，腾讯云环境填 ap-shanghai 或 ap-guangzhou；Vercel 环境不填
 ```
 
 #### 在 [Hexo Matery](https://github.com/blinkfox/hexo-theme-matery) 主题使用
@@ -174,12 +174,12 @@ twikoo:
 
 ``` html
 <div id="tcomment"></div>
-<script src="https://cdn.jsdelivr.net/npm/twikoo@1.4.17/dist/twikoo.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
 <script>
 twikoo.init({
-  envId: '您的环境id',
-  el: '#tcomment',
-  // region: 'ap-guangzhou', // 环境地域，默认为 ap-shanghai，如果您的环境地域不是上海，需传此参数
+  envId: '您的环境id', // 腾讯云环境填 envId；Vercel 环境填地址（https://xxx.vercel.app）
+  el: '#tcomment', // 容器元素
+  // region: 'ap-guangzhou', // 环境地域，默认为 ap-shanghai，腾讯云环境填 ap-shanghai 或 ap-guangzhou；Vercel 环境不填
   // path: 'window.location.pathname', // 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
   // lang: 'zh-CN', // 用于手动设定评论区语言，支持的语言列表 https://github.com/imaegoo/twikoo/blob/dev/src/js/utils/i18n/index.js
 })
@@ -187,6 +187,12 @@ twikoo.init({
 ```
 
 > 建议使用 CDN 引入 Twikoo 的用户在链接地址上锁定版本，以免将来 Twikoo 升级时受到非兼容性更新的影响。
+
+#### [爆米兔](https://cdn.baomitu.com/) CDN 镜像
+
+请参考爆米兔前端静态资源库 [https://cdn.baomitu.com/twikoo](https://cdn.baomitu.com/twikoo)
+
+引入的 CDN 链接替换为如下即可：`https://lib.baomitu.com/twikoo/1.5.0/twikoo.all.min.js`
 
 ## 开启管理面板
 
