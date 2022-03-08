@@ -56,6 +56,7 @@ export default {
   background-color: rgba(0,0,0,0.19);
 }
 .tk-content img {
+  display: unset;
   max-width: 300px;
   max-height: 300px;
   vertical-align: middle;
