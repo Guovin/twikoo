@@ -23,11 +23,15 @@ const tencentcloud = require('tencentcloud-sdk-nodejs') // 腾讯云 API NODEJS 
 const { v4: uuidv4 } = require('uuid') // 用户 id 生成
 const fs = require('fs')
 const FormData = require('form-data') // 图片上传
-const pushoo = require('pushoo').default
+const pushoo = require('pushoo').default // 即时消息通知
+const ipToRegion = require('dy-node-ip2region') // IP 属地查询
 
 // 初始化反 XSS
 const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window)
+
+// 初始化 IP 属地
+const ipRegionSearcher = ipToRegion.create()
 
 // 常量 / constants
 const RES_CODE = {
@@ -46,6 +50,7 @@ const RES_CODE = {
   AKISMET_ERROR: 1030,
   UPLOAD_FAILED: 1040
 }
+const MAX_REQUEST_TIMES = parseInt(process.env.TWIKOO_THROTTLE) || 250
 
 // 全局变量 / variables
 let db = null
@@ -54,15 +59,18 @@ let transporter
 let request
 let response
 let accessToken
+const requestTimes = {}
 
 module.exports = async (requestArg, responseArg) => {
   request = requestArg
   response = responseArg
   const event = request.body || {}
+  console.log('请求ＩＰ：', request.headers['x-real-ip'])
   console.log('请求方法：', event.event)
   console.log('请求参数：', event)
   let res = {}
   try {
+    protect()
     anonymousSignIn()
     await connectToDatabase(process.env.MONGODB_URI)
     await readConfig()
@@ -159,12 +167,24 @@ module.exports = async (requestArg, responseArg) => {
 function allowCors () {
   if (request.headers.origin) {
     response.setHeader('Access-Control-Allow-Credentials', true)
-    response.setHeader('Access-Control-Allow-Origin', config.CORS_ALLOW_ORIGIN || request.headers.origin)
+    response.setHeader('Access-Control-Allow-Origin', getAllowedOrigin())
     response.setHeader('Access-Control-Allow-Methods', 'POST')
     response.setHeader(
       'Access-Control-Allow-Headers',
       'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
     )
+  }
+}
+
+function getAllowedOrigin () {
+  const localhostRegex = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{1,5})?$/
+  if (localhostRegex.test(request.headers.origin)) {
+    return request.headers.origin
+  } else if (config.CORS_ALLOW_ORIGIN) {
+    // 许多用户设置安全域名时，喜欢带结尾的 "/"，必须处理掉
+    return config.CORS_ALLOW_ORIGIN.replace(/\/$/, '')
+  } else {
+    return request.headers.origin
   }
 }
 
@@ -359,13 +379,15 @@ function parseComment (comments, uid) {
 function toCommentDto (comment, uid, replies = [], comments = []) {
   let displayOs = ''
   let displayBrowser = ''
-  try {
-    const ua = bowser.getParser(comment.ua)
-    const os = ua.getOS()
-    displayOs = [os.name, os.versionName ? os.versionName : os.version].join(' ')
-    displayBrowser = [ua.getBrowserName(), ua.getBrowserVersion()].join(' ')
-  } catch (e) {
-    console.log('bowser 错误：', e)
+  if (config.SHOW_UA !== 'false') {
+    try {
+      const ua = bowser.getParser(comment.ua)
+      const os = ua.getOS()
+      displayOs = [os.name, os.versionName ? os.versionName : os.version].join(' ')
+      displayBrowser = [ua.getBrowserName(), ua.getBrowserVersion()].join(' ')
+    } catch (e) {
+      console.log('bowser 错误：', e)
+    }
   }
   return {
     id: comment._id.toString(),
@@ -376,6 +398,7 @@ function toCommentDto (comment, uid, replies = [], comments = []) {
     comment: comment.comment,
     os: displayOs,
     browser: displayBrowser,
+    ipRegion: config.SHOW_REGION ? getIpRegion({ ip: comment.ip }) : '',
     master: comment.master,
     like: comment.like ? comment.like.length : 0,
     liked: comment.like ? comment.like.findIndex((item) => item === uid) > -1 : false,
@@ -456,7 +479,7 @@ function getCommentSearchCondition (event) {
 
 function parseCommentForAdmin (comments) {
   for (const comment of comments) {
-    comment.commentText = $(comment.comment).text()
+    comment.ipRegion = getIpRegion({ ip: comment.ip, detail: true })
   }
   return comments
 }
@@ -1000,7 +1023,12 @@ async function noticePushoo (comment) {
   const sendResult = await pushoo(config.PUSHOO_CHANNEL, {
     token: config.PUSHOO_TOKEN,
     title: pushContent.subject,
-    content: pushContent.content
+    content: pushContent.content,
+    options: {
+      bark: {
+        url: pushContent.url
+      }
+    }
   })
   console.log('即时消息通知结果：', sendResult)
 }
@@ -1024,7 +1052,8 @@ function getIMPushContent (comment) {
 原文链接：[${POST_URL}](${POST_URL})`
   return {
     subject,
-    content
+    content,
+    url: POST_URL
   }
 }
 
@@ -1123,7 +1152,7 @@ async function parse (comment) {
     comment: DOMPurify.sanitize(comment.comment, { FORBID_TAGS: ['style'], FORBID_ATTR: ['style'] }),
     pid: comment.pid ? comment.pid : comment.rid,
     rid: comment.rid,
-    isSpam: isAdminUser ? false : preCheckSpam(comment.comment),
+    isSpam: isAdminUser ? false : preCheckSpam(comment),
     created: timestamp,
     updated: timestamp
   }
@@ -1167,7 +1196,13 @@ async function limitFilter () {
 }
 
 // 预垃圾评论检测
-function preCheckSpam (comment) {
+function preCheckSpam ({ comment, nick }) {
+  // 长度限制
+  let limitLength = parseInt(config.LIMIT_LENGTH)
+  if (Number.isNaN(limitLength)) limitLength = 500
+  if (limitLength && comment.length > limitLength) {
+    throw new Error('评论内容过长')
+  }
   if (config.AKISMET_KEY === 'MANUAL_REVIEW') {
     // 人工审核
     console.log('已使用人工审核模式，评论审核后才会发表~')
@@ -1175,7 +1210,7 @@ function preCheckSpam (comment) {
   } else if (config.FORBIDDEN_WORDS) {
     // 违禁词检测
     for (const forbiddenWord of config.FORBIDDEN_WORDS.split(',')) {
-      if (comment.indexOf(forbiddenWord.trim()) !== -1) {
+      if (comment.indexOf(forbiddenWord.trim()) !== -1 || nick.indexOf(forbiddenWord.trim()) !== -1) {
         console.log('包含违禁词，直接标记为垃圾评论~')
         return true
       }
@@ -1387,9 +1422,9 @@ async function emailTest (event) {
   const isAdminUser = await isAdmin()
   if (isAdminUser) {
     try {
-      if (!transporter) {
-        await initMailer({ throwErr: true })
-      }
+      // 邮件测试前清除 transporter，保证读取的是最新的配置
+      transporter = null
+      await initMailer({ throwErr: true })
       const sendResult = await transporter.sendMail({
         from: config.SENDER_EMAIL,
         to: event.mail || config.BLOGGER_EMAIL || config.SENDER_EMAIL,
@@ -1411,21 +1446,16 @@ async function uploadImage (event) {
   const { photo, fileName } = event
   const res = {}
   try {
-    if (!config.IMAGE_CDN_TOKEN) {
+    if (!config.IMAGE_CDN || !config.IMAGE_CDN_TOKEN) {
       throw new Error('未配置图片上传服务')
     }
-    const formData = new FormData()
-    formData.append('image', base64UrlToReadStream(photo, fileName))
-    const uploadResult = await axios.post('https://7bu.top/api/upload', formData, {
-      headers: {
-        ...formData.getHeaders(),
-        token: config.IMAGE_CDN_TOKEN
-      }
-    })
-    if (uploadResult.data.code === 200) {
-      res.data = uploadResult.data.data
-    } else {
-      throw new Error(uploadResult.data.msg)
+    // tip: qcloud 图床走前端上传，其他图床走后端上传
+    if (config.IMAGE_CDN === '7bu') {
+      await uploadImageToLskyPro({ photo, fileName, config, res, imageCdn: 'https://7bu.top' })
+    } else if (config.IMAGE_CDN === 'smms') {
+      await uploadImageToSmms({ photo, fileName, config, res })
+    } else if (isUrl(config.IMAGE_CDN)) {
+      await uploadImageToLskyPro({ photo, fileName, config, res, imageCdn: config.IMAGE_CDN })
     }
   } catch (e) {
     console.error(e)
@@ -1435,11 +1465,55 @@ async function uploadImage (event) {
   return res
 }
 
+async function uploadImageToSmms ({ photo, fileName, config, res }) {
+  // SM.MS 图床 https://sm.ms
+  const formData = new FormData()
+  formData.append('smfile', base64UrlToReadStream(photo, fileName))
+  const uploadResult = await axios.post('https://sm.ms/api/v2/upload', formData, {
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: config.IMAGE_CDN_TOKEN
+    }
+  })
+  if (uploadResult.data.success) {
+    res.data = uploadResult.data.data
+  } else {
+    throw new Error(uploadResult.data.message)
+  }
+}
+
+async function uploadImageToLskyPro ({ photo, fileName, config, res, imageCdn }) {
+  // 自定义兰空图床（v2）URL
+  const formData = new FormData()
+  formData.append('file', base64UrlToReadStream(photo, fileName))
+  const url = `${imageCdn}/api/v1/upload`
+  let token = config.IMAGE_CDN_TOKEN
+  if (!token.startsWith('Bearer')) {
+    token = `Bearer ${token}`
+  }
+  const uploadResult = await axios.post(url, formData, {
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: token
+    }
+  })
+  if (uploadResult.data.status) {
+    res.data = uploadResult.data.data
+    res.data.url = res.data.links.url
+  } else {
+    throw new Error(uploadResult.data.message)
+  }
+}
+
 function base64UrlToReadStream (base64Url, fileName) {
   const base64 = base64Url.split(';base64,').pop()
   const path = `/tmp/${fileName}`
   fs.writeFileSync(path, base64, { encoding: 'base64' })
   return fs.createReadStream(path)
+}
+
+function isUrl (s) {
+  return /^http(s)?:\/\//.test(s)
 }
 
 function getAvatar (comment) {
@@ -1498,7 +1572,8 @@ async function getConfig () {
       REQUIRED_FIELDS: config.REQUIRED_FIELDS,
       HIDE_ADMIN_CRYPT: config.HIDE_ADMIN_CRYPT,
       HIGHLIGHT: config.HIGHLIGHT || 'true',
-      HIGHLIGHT_THEME: config.HIGHLIGHT_THEME
+      HIGHLIGHT_THEME: config.HIGHLIGHT_THEME,
+      LIMIT_LENGTH: config.LIMIT_LENGTH
     }
   }
 }
@@ -1532,6 +1607,18 @@ async function setConfig (event) {
       code: RES_CODE.NEED_LOGIN,
       message: '请先登录'
     }
+  }
+}
+
+function protect () {
+  // 防御
+  const ip = request.headers['x-real-ip']
+  requestTimes[ip] = (requestTimes[ip] || 0) + 1
+  if (requestTimes[ip] > MAX_REQUEST_TIMES) {
+    console.log(`${ip} 当前请求次数为 ${requestTimes[ip]}，已超过最大请求次数`)
+    throw new Error('Too Many Requests')
+  } else {
+    console.log(`${ip} 当前请求次数为 ${requestTimes[ip]}`)
   }
 }
 
@@ -1585,6 +1672,27 @@ async function getUid () {
 async function isAdmin () {
   const uid = await getUid()
   return config.ADMIN_PASS === md5(uid)
+}
+
+/**
+ * 获取 IP 属地
+ * @param detail true 返回省市运营商，false 只返回省
+ * @returns {String}
+ */
+function getIpRegion ({ ip, detail = false }) {
+  if (!ip) return ''
+  try {
+    const { region } = ipRegionSearcher.btreeSearchSync(ip)
+    const [,, province, city, isp] = region.split('|')
+    if (detail) {
+      return province === city ? [city, isp].join(' ') : [province, city, isp].join(' ')
+    } else {
+      return province
+    }
+  } catch (e) {
+    console.error('IP 属地查询失败：', e)
+    return ''
+  }
 }
 
 // 判断是否为递归调用（即云函数调用自身）

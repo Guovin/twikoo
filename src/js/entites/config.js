@@ -24,6 +24,7 @@ class Config {
     this.QCLOUD_SECRET_KEY = model.QCLOUD_SECRET_KEY
     this.LIMIT_PER_MINUTE = model.LIMIT_PER_MINUTE
     this.LIMIT_PER_MINUTE_ALL = model.LIMIT_PER_MINUTE_ALL
+    this.LIMIT_LENGTH = model.LIMIT_LENGTH
     this.FORBIDDEN_WORDS = model.FORBIDDEN_WORDS
     this.NOTIFY_SPAM = model.NOTIFY_SPAM
     this.SC_MAIL_NOTIFY = model.SC_MAIL_NOTIFY
@@ -43,6 +44,8 @@ class Config {
     this.MAIL_TEMPLATE = model.MAIL_TEMPLATE
     this.MAIL_SUBJECT_ADMIN = model.MAIL_SUBJECT_ADMIN
     this.MAIL_TEMPLATE_ADMIN = model.MAIL_TEMPLATE_ADMIN
+    this.SHOW_UA = model.SHOW_UA
+    this.SHOW_REGION = model.SHOW_REGION
   }
 }
 

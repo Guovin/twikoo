@@ -78,6 +78,13 @@ export default {
           ]
         },
         {
+          name: t('ADMIN_CONFIG_CATEGORY_PRIVACY'),
+          items: [
+            { key: 'SHOW_UA', desc: t('ADMIN_CONFIG_ITEM_SHOW_UA'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}false`, value: '' },
+            { key: 'SHOW_REGION', desc: t('ADMIN_CONFIG_ITEM_SHOW_REGION'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}true`, value: '' }
+          ]
+        },
+        {
           name: t('ADMIN_CONFIG_CATEGORY_SPAM'),
           items: [
             { key: 'AKISMET_KEY', desc: t('ADMIN_CONFIG_ITEM_AKISMET_KEY'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}8651783edxxx`, value: '' },
@@ -85,6 +92,7 @@ export default {
             { key: 'QCLOUD_SECRET_KEY', desc: t('ADMIN_CONFIG_ITEM_QCLOUD_SECRET_KEY'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}XrkOnvKWS7WeXbP1QZT76rPgtpWx73D7`, value: '', secret: true },
             { key: 'LIMIT_PER_MINUTE', desc: t('ADMIN_CONFIG_ITEM_LIMIT_PER_MINUTE'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}5`, value: '' },
             { key: 'LIMIT_PER_MINUTE_ALL', desc: t('ADMIN_CONFIG_ITEM_LIMIT_PER_MINUTE_ALL'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}5`, value: '' },
+            { key: 'LIMIT_LENGTH', desc: t('ADMIN_CONFIG_ITEM_LIMIT_LENGTH'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}100`, value: '' },
             { key: 'FORBIDDEN_WORDS', desc: t('ADMIN_CONFIG_ITEM_FORBIDDEN_WORDS'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}快递,空包`, value: '' },
             { key: 'NOTIFY_SPAM', desc: t('ADMIN_CONFIG_ITEM_NOTIFY_SPAM'), ph: `${t('ADMIN_CONFIG_EXAMPLE')}false`, value: '' }
           ]

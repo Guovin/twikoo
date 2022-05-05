@@ -3,7 +3,7 @@
 Twikoo 分为云函数和前端两部分，部署时请注意保持二者版本一致。
 
 * [云函数部署](#云函数部署)有 4 种方式，[一键部署](#一键部署)、[手动部署](#手动部署)、[命令行部署](#命令行部署)和[Vercel 部署](#vercel-部署)。
-* [前端部署](#前端部署)有 2 种方式，如果您的网站主题支持 Twikoo，您只需在配置文件中指定 Twikoo 即可；如果您的网站主题不支持 Twikoo，您需要修改源码手动引入 Twikoo 的 js 文件并初始化之。
+* [前端部署](#前端部署)有 2 种方式，如果您的网站主题支持 Twikoo，您只需在配置文件中指定 Twikoo 即可；如果您的网站主题不支持 Twikoo，您需要修改源码手动引入 Twikoo 的 js 文件并初始化。
 
 ## 云函数部署
 
@@ -17,7 +17,7 @@ Twikoo 分为云函数和前端两部分，部署时请注意保持二者版本�
 ### 一键部署
 
 1. 点击以下按钮将 Twikoo 一键部署到云开发<br>
-[![部署到云开发](https://main.qcloudimg.com/raw/67f5a389f1ac6f3b4d04c7256438e44f.svg)](https://console.cloud.tencent.com/tcb/env/index?action=CreateAndDeployCloudBaseProject&appUrl=https%3A%2F%2Fgithub.com%2Fimaegoo%2Ftwikoo&branch=dev)
+[![部署到云开发](https://main.qcloudimg.com/raw/67f5a389f1ac6f3b4d04c7256438e44f.svg)](https://console.cloud.tencent.com/tcb/env/index?action=CreateAndDeployCloudBaseProject&appUrl=https%3A%2F%2Fgithub.com%2Fimaegoo%2Ftwikoo&branch=main)
 2. 进入[环境-登录授权](https://console.cloud.tencent.com/tcb/env/login)，启用“匿名登录”
 3. 进入[环境-安全配置](https://console.cloud.tencent.com/tcb/env/safety)，将网站域名添加到“WEB安全域名”
 
@@ -44,7 +44,7 @@ exports.main = require('twikoo-func').main
 8. 创建完成后，点击“twikoo"进入云函数详情页，进入“函数代码”标签，点击“文件 - 新建文件”，输入 `package.json`，回车
 9. 复制以下代码、粘贴到代码框中，点击“保存并安装依赖”
 ``` json
-{ "dependencies": { "twikoo-func": "1.5.0" } }
+{ "dependencies": { "twikoo-func": "1.5.9" } }
 ```
 
 ### 命令行部署
@@ -96,10 +96,11 @@ Vercel 部署的环境需配合 1.4.0 以上版本的 twikoo.js 使用
 3. 在 Clusters 页面点击 CONNECT，按步骤设置允许所有 IP 地址的连接（[为什么？](https://vercel.com/support/articles/how-to-allowlist-deployment-ip-address)），创建数据库用户，并记录数据库连接字符串，请将连接字符串中的 `<password>` 修改为数据库密码
 4. 申请 [Vercel](https://vercel.com/signup) 账号
 5. 点击以下按钮将 Twikoo 一键部署到 Vercel<br>
-[![](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/imaegoo/twikoo/tree/dev/src/vercel-min)
+[![](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/imaegoo/twikoo/tree/main/src/vercel-min)
 6. 进入 Settings - Environment Variables，添加环境变量 `MONGODB_URI`，值为第 3 步的数据库连接字符串
-7. 进入 Overview，点击 Domains 下方的链接，如果环境配置正确，可以看到 “Twikoo 云函数运行正常” 的提示
-8. Vercel Domains（包含 `https://` 前缀，例如 `https://xxx.vercel.app`）即为您的环境 id
+7. 进入 Deployments , 然后在任意一项后面点击更多（三个点） , 然后点击Redeploy , 最后点击下面的Redeploy
+8. 进入 Overview，点击 Domains 下方的链接，如果环境配置正确，可以看到 “Twikoo 云函数运行正常” 的提示
+9. Vercel Domains（包含 `https://` 前缀，例如 `https://xxx.vercel.app`）即为您的环境 id
 
 ## 前端部署
 
@@ -174,14 +175,14 @@ twikoo:
 
 ``` html
 <div id="tcomment"></div>
-<script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.9/dist/twikoo.all.min.js"></script>
 <script>
 twikoo.init({
   envId: '您的环境id', // 腾讯云环境填 envId；Vercel 环境填地址（https://xxx.vercel.app）
   el: '#tcomment', // 容器元素
   // region: 'ap-guangzhou', // 环境地域，默认为 ap-shanghai，腾讯云环境填 ap-shanghai 或 ap-guangzhou；Vercel 环境不填
-  // path: 'window.location.pathname', // 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
-  // lang: 'zh-CN', // 用于手动设定评论区语言，支持的语言列表 https://github.com/imaegoo/twikoo/blob/dev/src/js/utils/i18n/index.js
+  // path: location.pathname, // 用于区分不同文章的自定义 js 路径，如果您的文章路径不是 location.pathname，需传此参数
+  // lang: 'zh-CN', // 用于手动设定评论区语言，支持的语言列表 https://github.com/imaegoo/twikoo/blob/main/src/js/utils/i18n/index.js
 })
 </script>
 ```
@@ -192,7 +193,7 @@ twikoo.init({
 
 请参考爆米兔前端静态资源库 [https://cdn.baomitu.com/twikoo](https://cdn.baomitu.com/twikoo)
 
-引入的 CDN 链接替换为如下即可：`https://lib.baomitu.com/twikoo/1.5.0/twikoo.all.min.js`
+引入的 CDN 链接替换为如下即可：`https://lib.baomitu.com/twikoo/1.5.9/twikoo.all.min.js`
 
 ## 开启管理面板
 
@@ -208,8 +209,8 @@ twikoo.init({
 
 登录[环境-我的应用](https://console.cloud.tencent.com/tcb/apps/index)，输入
 
-* 来源地址：`https://github.com/imaegoo/twikoo/tree/dev`
-* 部署分支：`dev`
+* 来源地址：`https://github.com/imaegoo/twikoo/tree/main`
+* 部署分支：`main`
 
 应用目录无需填写，点击“确定”，部署完成。
 

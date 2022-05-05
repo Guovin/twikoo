@@ -12,16 +12,18 @@ const S = {
 
 const pushooChannels = [
   'qmsg',
-  'serverchain',
+  'serverchan',
   'pushplus',
   'pushplushxtrip',
   'dingtalk',
   'wecom',
   'bark',
   'gocqhttp',
+  'atri',
   'pushdeer',
   'igot',
-  'telegram'
+  'telegram',
+  'feishu'
 ].map(s => `"${s}"`)
 
 const smtpServices = [
@@ -66,6 +68,35 @@ const smtpServices = [
   'iCloud',
   'mail.ee',
   'qiye.aliyun'
+].map(s => `"${s}"`)
+
+const highlightThemes = [
+  'default',
+  'coy',
+  'dark',
+  'funky',
+  'okaidia',
+  'solarizedlight',
+  'tomorrow',
+  'twilight'
+].map(s => `"${s}"`)
+
+const imageBedServices = [
+  'qcloud',
+  '7bu',
+  'https://7bu.top',
+  'smms'
+].map(s => `"${s}"`)
+
+const defaultGravatar = [
+  '404',
+  'mp',
+  'identicon',
+  'monsterid',
+  'wavatar',
+  'retro',
+  'robohash',
+  'blank'
 ].map(s => `"${s}"`)
 
 /**
@@ -205,6 +236,12 @@ export default {
     '外掛',
     'Plugin'
   ],
+  [S.ACC + '_PRIVACY']: [
+    '隐私',
+    '隱私',
+    '隱私',
+    'Privacy'
+  ],
   [S.ACC + '_SPAM']: [
     '反垃圾',
     '反垃圾',
@@ -278,16 +315,16 @@ export default {
     'Comment placeholder. Use <br> to start a newline. Default: empty.'
   ],
   [S.ACI + '_CORS_ALLOW_ORIGIN']: [
-    'Vercel 安全域名，防止环境被盗用，请注意设置后将无法在本地（localhost）加载评论，默认为空',
-    'Vercel 安全域名，防止環境被盜用，請注意設置後將無法在本地（localhost）加載評論，默認為空',
-    'Vercel 安全域名，防止環境被盜用，請注意設置後將無法在本地（localhost）加載評論，默認為空',
-    'Vercel 安全域名，防止环境被盗用，请注意设置后将无法在本地（localhost）加载评论，默认为空'
+    'Vercel CORS 安全域名，注意：错误设置会导致无法加载，默认为空，格式为 https://blog.example.com',
+    'Vercel CORS 安全域名，注意：错误设置会导致无法加載，默認為空，格式为 https://blog.example.com',
+    'Vercel CORS 安全域名，注意：错误设置会导致无法加載，默認為空，格式为 https://blog.example.com',
+    'Vercel CORS allow origin, note: incorrect settings can cause loading failure. Default: blank, format: https://blog.example.com'
   ],
   [S.ACI + '_DEFAULT_GRAVATAR']: [
-    '默认的头像显示。默认值为 "identicon"，可选： 404、mp、identicon、monsterid、wavatar、retro、robohash、blank',
-    '預設的頭像顯示。預設值為 "identicon"，可選： 404、mp、identicon、monsterid、wavatar、retro、robohash、blank',
-    '預設的頭像顯示。預設值為 "identicon"，可選： 404、mp、identicon、monsterid、wavatar、retro、robohash、blank',
-    'Avatar placeholder. Default:  "identicon". Choose from: 404, mp, identicon, monsterid, wavatar, retro, robohash, blank.'
+    `默认的头像显示。默认值为 "identicon"，可选：${defaultGravatar.join('、')}`,
+    `預設的頭像顯示。預設值為 "identicon"，可選：${defaultGravatar.join('、')}`,
+    `預設的頭像顯示。預設值為 "identicon"，可選：${defaultGravatar.join('、')}`,
+    `Avatar placeholder. Default:  "identicon". Choose from: ${defaultGravatar.join(', ')}`
   ],
   [S.ACI + '_EMOTION_CDN']: [
     '表情 CDN，默认为：https://cdn.jsdelivr.net/gh/imaegoo/emotion/owo.json',
@@ -320,34 +357,40 @@ export default {
     'Enable code highlighting. If your theme conflicts with code highlighting, please set it to false. Default: true.'
   ],
   [S.ACI + '_HIGHLIGHT_THEME']: [
-    '代码高亮主题，可选：default、coy、dark、funky、okaidia、solarizedlight、tomorrow、twilight，访问 https://prismjs.com 可预览主题效果。如果您的主题和代码高亮有冲突，请设为 none。默认：none',
-    '代碼高亮主題，可選：default、coy、dark、funky、okaidia、solarizedlight、tomorrow、twilight，訪問 https://prismjs.com 可預覽主題效果。如果您的主題和代碼高亮有衝突，請設為 none。預設：none',
-    '程式碼高亮主題，可選：default、coy、dark、funky、okaidia、solarizedlight、tomorrow、twilight，訪問 https://prismjs.com 可預覽主題效果。如果您的主題和程式碼高亮有衝突，請設為 none。預設：none',
-    'Code highlighting theme. Select from: default、coy、dark、funky、okaidia、solarizedlight、tomorrow、twilight. Visit https://prismjs.com for preview. If your theme conflicts with code highlighting, please set it to none. Default: none.'
+    `代码高亮主题，可选：${highlightThemes.join('、')}，访问 https://prismjs.com 可预览主题效果。如果您的主题和代码高亮有冲突，请设为 none。默认：none`,
+    `代碼高亮主題，可選：${highlightThemes.join('、')}，訪問 https://prismjs.com 可預覽主題效果。如果您的主題和代碼高亮有衝突，請設為 none。預設：none`,
+    `程式碼高亮主題，可選：${highlightThemes.join('、')}，訪問 https://prismjs.com 可預覽主題效果。如果您的主題和程式碼高亮有衝突，請設為 none。預設：none`,
+    `Code highlighting theme. Select from: ${highlightThemes.join(', ')}. Visit https://prismjs.com for preview. If your theme conflicts with code highlighting, please set it to none. Default: none.`
   ],
   [S.ACI + '_IMAGE_CDN']: [
-    '插入图片所使用的图床，目前支持：7bu、qcloud',
-    '插入圖片所使用的圖床，目前支持：7bu、qcloud',
-    '插入圖片所使用的圖床，目前支援：7bu、qcloud',
-    'The image bed for image uploading. Select from: 7bu、qcloud'
+    `插入图片所使用的图床，目前支持：${imageBedServices.join('、')}`,
+    `插入圖片所使用的圖床，目前支持：${imageBedServices.join('、')}`,
+    `插入圖片所使用的圖床，目前支援：${imageBedServices.join('、')}`,
+    `The image bed for image uploading. Select from: ${imageBedServices.join(', ')}`
   ],
   [S.ACI + '_IMAGE_CDN_TOKEN']: [
-    '7bu 的图床 token',
-    '7bu 的图床 token',
-    '7bu 的图床 token',
-    'The image bed token for 7bu.'
+    '图床 token。qcloud 图床无需设置',
+    '图床 token。qcloud 图床无需设置',
+    '图床 token。qcloud 图床无需设置',
+    'The image bed token. Unnessessary for qcloud'
   ],
   [S.ACI + '_LIMIT_PER_MINUTE']: [
-    '每个 IP 每 10 分钟最多发表多少条评论，0 为无限制，默认：10',
-    '每個 IP 每 10 分鐘最多發表多少條評論，0 為無限制，預設：10',
-    '每個 IP 每 10 分鐘最多發表多少條評論，0 為無限制，預設：10',
-    'How many comments can be posted by each IP every 10 minutes, default: 0 (unlimited).'
+    '单个 IP 发言频率限制（条/10分钟），0 为无限制，默认：10',
+    '單個 IP 發言頻率限制（條/10分鐘），0 為無限制，預設：10',
+    '單個 IP 發言頻率限制（條/10分鐘），0 為無限制，預設：10',
+    'How many comments can be posted by each IP every 10 minutes, 0 is unlimited, default: 10.'
   ],
   [S.ACI + '_LIMIT_PER_MINUTE_ALL']: [
-    '所有 IP 每 10 分钟最多发表多少条评论，0 为无限制，默认：10',
-    '所有 IP 每 10 分鐘最多發表多少條評論，0 為無限制，預設：10',
-    '所有 IP 每 10 分鐘最多發表多少條評論，0 為無限制，預設：10',
-    'How many comments can be posted by all IPs every 10 minutes, default: 0 (unlimited).'
+    '全站发言频率限制（条/10分钟），0 为无限制，默认：10',
+    '全站發言頻率限制（條/10分鐘），0 為無限制，預設：10',
+    '全站發言頻率限制（條/10分鐘），0 為無限制，預設：10',
+    'How many comments can be posted by all IPs every 10 minutes, 0 is unlimited, default: 10.'
+  ],
+  [S.ACI + '_LIMIT_LENGTH']: [
+    '评论长度限制，0 为无限制，默认：500',
+    '評論長度限制，0 為無限制，預設：500',
+    '評論長度限制，0 為無限制，預設：500',
+    'Comment length limitation, 0 is unlimited, default: 500.'
   ],
   [S.ACI + '_MAIL_SUBJECT']: [
     '自定义通知邮件主题，留空则使用默认主题。',
@@ -444,6 +487,18 @@ export default {
     '啟用插入圖片功能，預設為：true',
     '啟用插入圖片功能，預設為：true',
     'Enable picture uploading. Default: true.'
+  ],
+  [S.ACI + '_SHOW_UA']: [
+    '是否显示用户系统和浏览器，默认为：true',
+    '是否顯示使用者系統和瀏覽器，預設為：true',
+    '是否顯示使用者系統和瀏覽器，預設為：true',
+    'Show users\' OS and browser. Default: true.'
+  ],
+  [S.ACI + '_SHOW_REGION']: [
+    '是否显示用户 IP 属地到省，默认为：false',
+    '是否顯示使用者 IP 屬地到省，預設為：false',
+    '是否顯示使用者 IP 屬地到省，預設為：false',
+    'Show users\' IP region (province). Default: false.'
   ],
   [S.ACI + '_SITE_NAME']: [
     '网站名称',
