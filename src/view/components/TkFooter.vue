@@ -18,6 +18,7 @@ export default {
   },
   methods: {
     async getCounter () {
+      if (['localhost', '127.0.0.1', '0.0.0.0'].indexOf(window.location.hostname) !== -1) return
       const url = getUrl(this.$twikoo.path)
       const counterEls = document.getElementsByClassName('twikoo_visitors_counter')
       if (!counterEls) return
