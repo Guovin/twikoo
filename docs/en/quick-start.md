@@ -1,4 +1,8 @@
-# 快速上手
+# Quick start
+
+::: tip Tip
+The English document is being built. Please refer to the Chinese document.
+:::
 
 Twikoo 分为云函数和前端两部分，部署时请注意保持二者版本一致。
 
@@ -175,7 +179,7 @@ twikoo:
 
 ``` html
 <div id="tcomment"></div>
-<script src="https://cdn.staticfile.org/twikoo/1.5.11/twikoo.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.11/dist/twikoo.all.min.js"></script>
 <script>
 twikoo.init({
   envId: '您的环境id', // 腾讯云环境填 envId；Vercel 环境填地址（https://xxx.vercel.app）

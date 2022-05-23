@@ -1,6 +1,6 @@
 {
   "name": "twikoo-govin",
-  "version": "1.5.10",
+  "version": "1.5.11",
   "description": "A simple comment system based on Tencent CloudBase (tcb).",
   "keywords": [
     "twikoojs",
@@ -29,8 +29,8 @@
     "logout": "tcb logout",
     "deploy": "tcb fn deploy twikoo --force",
     "lint": "eslint src/** --ignore-path .eslintignore",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs:dev": "cd docs && yarn docs:dev",
+    "docs:build": "cd docs && yarn docs:build"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
@@ -63,7 +63,6 @@
     "vue": "^2.6.14",
     "vue-loader": "^15.9.8",
     "vue-template-compiler": "^2.6.14",
-    "vuepress": "^1.8.2",
     "webpack": "^5.63.0",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.1",
