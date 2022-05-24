@@ -18,19 +18,36 @@ export default {
   },
   methods: {
     async getCounter () {
-      const counterEl = document.getElementById('twikoo_visitors')
-      if (!counterEl) return
+      const counterEls = document.getElementsByClassName('twikoo_visitors')
+      if (!counterEls) return
       if (['localhost', '127.0.0.1', '0.0.0.0'].indexOf(window.location.hostname) !== -1) return
       const url = getUrl(this.$twikoo.path)
+      let counterEl, result
+      const posts = Object.values(document.getElementsByClassName('post-title-link'))
+      if (posts && posts.length > 0) {
+        posts.forEach(async (item, index) => {
+          result = await this.getCounterResult(item.attributes.href.value, item.href, item.innerHtml)
+          this.counter = result.result
+          if (this.counter.time || this.counter.time === 0) {
+            counterEls[index].innerHTML = this.counter.time
+          }
+        })
+      } else {
+        counterEl = counterEls[0]
+        result = await this.getCounterResult(url, window.location.href, document.title)
+        this.counter = result.result
+        if (this.counter.time || this.counter.time === 0) {
+          counterEl.innerHTML = this.counter.time
+        }
+      }
+    },
+    async getCounterResult (url, href, title) {
       const result = await call(this.$tcb, 'COUNTER_GET', {
         url,
-        href: window.location.href,
-        title: document.title
+        href,
+        title
       })
-      this.counter = result.result
-      if (this.counter.time || this.counter.time === 0) {
-        counterEl.innerHTML = this.counter.time
-      }
+      return result
     }
   },
   mounted () {
