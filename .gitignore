@@ -92,7 +92,9 @@ dist
 # public
 
 # vuepress build output
-.vuepress/dist
+docs/.vuepress/dist
+docs/.vitepress/dist
+docs/.vitepress/cache
 
 # Serverless directories
 .serverless/
@@ -111,3 +113,7 @@ dist
 
 # VuePress temp file
 .temp
+
+# database
+db.json
+db.json.*

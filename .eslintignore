@@ -2,5 +2,6 @@
 *.json
 *.md
 LICENSE
-src/lib/marked/*
+src/client/lib/marked/*
+src/server/self-hosted/data/*
 yarn.lock

@@ -5,7 +5,7 @@ name: Docs
 
 on:
   release:
-    types: [created]
+    types: [released]
   workflow_dispatch:
 
 jobs:
@@ -19,8 +19,8 @@ jobs:
       - uses: imaegoo/vuepress-deploy@master
         env:
           ACCESS_TOKEN: ${{ secrets.TWIKOO_TOKEN }}
-          TARGET_REPO: imaegoo/twikoo
+          TARGET_REPO: twikoojs/twikoo
           TARGET_BRANCH: gh-pages
           BUILD_SCRIPT: cd docs && yarn && yarn docs:build
-          BUILD_DIR: .vuepress/dist
+          BUILD_DIR: .vitepress/dist
           CNAME: twikoo.js.org
